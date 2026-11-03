@@ -41,6 +41,15 @@ allowlisted read selects all in-stock pieces in an inclusive age range and
 emits JSON source evidence plus SQL/parameter trace. It reuses the existing
 read-only connection and harness; marketplace analysis is deferred.
 
+## Stage 2 Delivery 02
+
+[Delivery 02](DELIVERY_02.md) adds `stage2_matching` and the `stage2 match` CLI.
+It reuses the same inventory selector, schema and fixtures, querying each source
+by exact OEM or exact piece name. Python evaluates independent OEM and declared
+compatibility axes and preserves every selected piece. Each query has SQL,
+parameters and success/error trace evidence; failed source reads produce partial
+coverage rather than empty-success claims. Cataloguing remains unassessed.
+
 ## Upgrade paths (do not implement prematurely)
 
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.

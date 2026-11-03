@@ -1,4 +1,4 @@
-"""Opt-in Delivery 01 CLI; leaves the original seed/run commands unchanged."""
+"""Opt-in Stage 2 CLI; leaves the original seed/run commands unchanged."""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +10,7 @@ from pathlib import Path
 from .db import read_only_connection
 from .harness import Harness
 from .stage2_db import CANDIDATE_SQL, list_stage2_candidates, seed_stage2, validate_day_range
+from .stage2_matching import execute_stage2_matching
 
 
 def execute_stage2_selection(db_path: Path, *, min_days: int = 60,
@@ -33,22 +34,27 @@ def execute_stage2_selection(db_path: Path, *, min_days: int = 60,
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Stage 2 Delivery 01 (entirely synthetic, offline)")
+    parser = argparse.ArgumentParser(description="Stage 2 (entirely synthetic, offline)")
     sub = parser.add_subparsers(dest="command", required=True)
     seed = sub.add_parser("seed", help="Create a separate synthetic Stage 2 database")
     seed.add_argument("--db", type=Path, default=Path("data/stage2.sqlite"))
     select = sub.add_parser("select", help="Print all eligible inventory rows, source and trace as JSON")
-    select.add_argument("--db", type=Path, default=Path("data/stage2.sqlite"))
-    select.add_argument("--min-days", type=int, default=60)
-    select.add_argument("--max-days", type=int, default=90)
+    match = sub.add_parser("match", help="Compare synthetic OEM and declared compatibility in both sources")
+    for command in (select, match):
+        command.add_argument("--db", type=Path, default=Path("data/stage2.sqlite"))
+        command.add_argument("--min-days", type=int, default=60)
+        command.add_argument("--max-days", type=int, default=90)
     args = parser.parse_args()
     try:
         if args.command == "seed":
             seed_stage2(args.db)
             print(f"Created synthetic Stage 2 database: {args.db}")
         else:
-            result = execute_stage2_selection(args.db, min_days=args.min_days, max_days=args.max_days)
+            workflow = execute_stage2_selection if args.command == "select" else execute_stage2_matching
+            result = workflow(args.db, min_days=args.min_days, max_days=args.max_days)
             print(json.dumps(result, indent=2, ensure_ascii=False))
+            if args.command == "match" and not result["complete"]:
+                parser.exit(1, "Matching incomplete; inspect the JSON result and error trace.\n")
     except FileNotFoundError:
         parser.error(f"No Stage 2 DB: {args.db}. Run: python -m oem_agent.stage2 seed --db {args.db}")
     except (FileExistsError, ValueError, sqlite3.DatabaseError) as exc:

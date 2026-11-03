@@ -39,6 +39,11 @@ The default inclusive 60-90 day selection returns all 27 eligible pieces, with
 source rows and a SQL execution trace. See [Delivery 01](docs/DELIVERY_01.md)
 for the dataset, exact expected IDs, isolation guarantees and verification steps.
 
+Delivery 02 adds `python -m oem_agent.stage2 match` over the same database and
+27-piece selection. It reports independent OEM/compatibility classifications
+for both synthetic marketplaces, including empty retrievals and SQL errors.
+See [Delivery 02](docs/DELIVERY_02.md) for rules, trace fields and CLI exit codes.
+
 ### Optional: first LLM tool-calling agent
 
 ```powershell

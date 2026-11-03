@@ -27,3 +27,22 @@ Reasons:
 
 Status: Delivery 01 only. Matching, compatibility, percentiles, Excel, cost simulation
 and enforced human review remain subsequent increments. See `DELIVERY_01.md`.
+
+# Architecture Decision Record 003
+
+Decision: Delivery 02 separates offer retrieval, OEM identity and declared compatibility.
+
+Reasons:
+- Preserve Delivery 01 selection, seed/schema, source identities and all 27 results.
+- Retrieve by exact OEM OR exact name within one source, then classify every pair.
+- Compare OEM literally; do not infer equivalence from prefixes or vehicle metadata.
+- Confirm compatibility only when synthetic name/brand/model/version are known
+  and equal. Known contradictions take precedence over missing fields.
+- Preserve source rows and field-level reasons. Empty retrievals and failed reads
+  remain distinct, and neither determines incorrect inventory cataloguing.
+- Reuse the existing read-only connection and harness. Enrich only this workflow's
+  trace, retaining partial results and nonzero CLI exits on SQL coverage errors.
+- Do not add migrations, dependencies or price calculations.
+
+Status: Delivery 02 only; percentile bands, Excel, cost simulation, LLM changes and
+enforced human review remain deferred. See `DELIVERY_02.md`.

@@ -108,3 +108,22 @@ def list_stage2_candidates(conn: sqlite3.Connection, *, min_days: int = 60,
     """Return every in-stock row in the inclusive interval, in stable order."""
     validate_day_range(min_days, max_days)
     return [dict(row) for row in conn.execute(CANDIDATE_SQL, (min_days, max_days)).fetchall()]
+
+
+OFFER_SQL = """
+    SELECT marketplace_id, offer_id, oem, part_name, brand, model, version,
+           available_units, price_cents, observed_on
+    FROM stage2_market_offers
+    WHERE marketplace_id = ?
+      AND (oem COLLATE BINARY = ? OR part_name COLLATE BINARY = ?)
+    ORDER BY offer_id ASC
+"""
+
+
+def list_stage2_offers(conn: sqlite3.Connection, *, marketplace_id: str,
+                       oem: str | None, part_name: str | None) -> list[dict]:
+    """Retrieve candidates by exact OEM OR exact piece name, within one source."""
+    if marketplace_id not in {identifier for identifier, _ in MARKETPLACES}:
+        raise ValueError(f"Unknown synthetic marketplace: {marketplace_id}")
+    parameters = (marketplace_id, oem, part_name)
+    return [dict(row) for row in conn.execute(OFFER_SQL, parameters).fetchall()]
