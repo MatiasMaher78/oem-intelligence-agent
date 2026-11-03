@@ -1,0 +1,41 @@
+# Architecture and explicit agent anatomy
+
+```mermaid
+flowchart TD
+  A[Pure synthetic SQLite inventory] --> B[SQL: candidates]
+  B --> C[Python: exact OEM market evidence]
+  C --> D[Rules: flags and human-review priority]
+  D --> E[Canonical JSON and Markdown reports]
+  D --> F[Optional OpenAI Agents SDK]
+  F --> G[Agent tools: list_cases and inspect_case]
+  G --> F
+  F --> H[Unverified advisory memo]
+  B --> I[Local harness trace]
+  C --> I
+```
+
+The offline `rules` mode is a **deterministic workflow, not an LLM agent**.
+The `llm` mode introduces a model with tools and an execution loop managed by the Agents SDK.
+
+## Tool interfaces
+- `list_candidates(conn, days, limit)`: selects with parameterized SQL and hard cap.
+- `market_evidence(conn, oem)`: exact matching; returns evidence and min/max/units.
+- `list_cases()`: LLM-facing, precomputed summaries only.
+- `inspect_case(inventory_id)`: LLM-facing, restricted to selected candidate IDs.
+
+## Harness safety
+- DB connection uses URI `mode=ro` plus `PRAGMA query_only`.
+- Local explicit allowlist and tool-call budget: max candidates + one lookup.
+- Optional SDK max_turns=8; tool access restricted to precomputed evidence.
+- Reports never overwrite nonempty output directory.
+- Synthetic fixture only. No network market lookup. No database write tool.
+- Tracing to external SDK provider disabled in LLM demo by default to avoid exporting data; local workflow writes `trace.jsonl`.
+- A scheduler *triggers* workflow, it is not the same as an agent.
+
+## Upgrade paths (do not implement prematurely)
+1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.
+2. Persistence and idempotency for multi-run schedulers.
+3. Data ingestion from authorized public/owned sources, with rate limits and Terms review.
+4. HITL approval gateway for changes, entirely separate from analysis tools.
+5. Tool-level retry, timeout, circuit breaker, cost/token budget, metrics.
+6. Anomaly-based escalation with observability and alerts.

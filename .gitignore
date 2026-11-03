@@ -1,0 +1,74 @@
+# Python bytecode, caches and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local Python environments and build output
+.venv/
+venv/
+env/
+ENV/
+__pypackages__/
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Credentials stay local; only the placeholder template is versioned
+.env
+.env.*
+!/.env.example
+.envrc
+.secrets/
+.aws/
+.ssh/
+.netrc
+.pypirc
+credentials.json
+credentials.*.json
+client_secret*.json
+service-account*.json
+secrets.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Generated SQLite databases, journals and WAL/SHM files
+/data/
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-*
+*.sqlite3-*
+*.db-*
+
+# Generated reports and traces (examples/demo_report.md is source documentation)
+/runs/
+/reports/
+report.json
+report.md
+trace.jsonl
+llm_notes_UNVERIFIED.md
+
+# Temporary files, logs and desktop metadata
+/tmp/
+/temp/
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

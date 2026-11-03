@@ -1,0 +1,25 @@
+name: Synthetic inventory review (manual until explicitly enabled)
+on:
+  workflow_dispatch:
+  # Enable scheduling ONLY after reviewing permissions, safety and expected outputs:
+  # schedule:
+  #   - cron: '17 12 * * 1'  # Mondays 12:17 UTC; check local offset
+permissions:
+  contents: read
+jobs:
+  synthetic-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate invented data and run offline review
+        run: |
+          python -m oem_agent seed
+          python -m oem_agent run --mode rules --out runs/scheduled-demo
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-oem-review
+          path: runs/scheduled-demo/
+          retention-days: 7
