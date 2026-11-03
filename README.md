@@ -33,6 +33,12 @@ the existing database and reports are never overwritten by default. Inspect
 files eligible for a first commit with `git ls-files --others --exclude-standard`
 and excluded files with `git ls-files --others --ignored --exclude-standard`.
 
+Stage 2 Delivery 01 has a separate synthetic database and opt-in CLI:
+`python -m oem_agent.stage2 seed` then `python -m oem_agent.stage2 select`.
+The default inclusive 60-90 day selection returns all 27 eligible pieces, with
+source rows and a SQL execution trace. See [Delivery 01](docs/DELIVERY_01.md)
+for the dataset, exact expected IDs, isolation guarantees and verification steps.
+
 ### Optional: first LLM tool-calling agent
 
 ```powershell

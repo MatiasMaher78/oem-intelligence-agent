@@ -32,7 +32,17 @@ The `llm` mode introduces a model with tools and an execution loop managed by th
 - Tracing to external SDK provider disabled in LLM demo by default to avoid exporting data; local workflow writes `trace.jsonl`.
 - A scheduler *triggers* workflow, it is not the same as an agent.
 
+## Stage 2 Delivery 01
+
+Stage 2 [Delivery 01](DELIVERY_01.md) adds `oem_agent.stage2` and `stage2_db`
+without altering the original pipeline. Its separate database contains inventory
+identity/vehicle fields and two identifiable marketplace fixtures. A single
+allowlisted read selects all in-stock pieces in an inclusive age range and
+emits JSON source evidence plus SQL/parameter trace. It reuses the existing
+read-only connection and harness; marketplace analysis is deferred.
+
 ## Upgrade paths (do not implement prematurely)
+
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.
 2. Persistence and idempotency for multi-run schedulers.
 3. Data ingestion from authorized public/owned sources, with rate limits and Terms review.

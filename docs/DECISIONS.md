@@ -10,3 +10,20 @@ Reasons:
 - Scheduling is deliberately opt-in to avoid surprise automated calls.
 
 Status: initial lab, not a production app. Next ADR should discuss evaluation gates before real integrations.
+
+# Architecture Decision Record 002
+
+Decision: isolate Stage 2 Delivery 01 in a separate database and opt-in module CLI.
+
+Reasons:
+- Preserve the original fixture, schema, commands, rules and six-case baseline.
+- Exclusively create a fresh Stage 2 file; do not migrate, reset or overwrite databases.
+- Use parameterized SQL for `stock_qty > 0` and inclusive age bounds, with stable
+  ordering and no candidate cap or dependency on marketplace offer coverage.
+- Seed two sources explicitly, with offer identity scoped by marketplace.
+- Store invented offer prices in integer EUR cents without implementing price math.
+- Reuse read-only connections and a one-query harness with auditable source rows,
+  SQL and parameters; add no dependencies or external services.
+
+Status: Delivery 01 only. Matching, compatibility, percentiles, Excel, cost simulation
+and enforced human review remain subsequent increments. See `DELIVERY_01.md`.
