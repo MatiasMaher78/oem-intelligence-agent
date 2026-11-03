@@ -46,3 +46,25 @@ Reasons:
 
 Status: Delivery 02 only; percentile bands, Excel, cost simulation, LLM changes and
 enforced human review remain deferred. See `DELIVERY_02.md`.
+
+# Architecture Decision Record 004
+
+Decision: Delivery 03 computes exact demonstrative percentile filtering and
+exports its audited results through an optional Excel adapter.
+
+Reasons:
+- The original dataset has at most two usable comparable offers per piece, so a
+  separate seed supplies ten for one existing piece without changing old fixtures.
+- Require exact OEM, confirmed compatibility and available, valid source offers;
+  keep all rejected evidence, including zero-stock and unrelated listings.
+- Deduplicate per piece by source-local identity; exclude all conflicting copies.
+- Use unweighted linear interpolation at `(n-1)*p/100` with exact rational cents.
+- Distinguish observed extrema, quantile cutoffs and filtered actual extrema.
+- Default to P10/P90 and minimum 10; withhold filtering for insufficient samples
+  or incomplete coverage. Meeting a demonstrative threshold is not real validation.
+- Add a full-source audit read, preserve matching traces, and separate calculation
+  traces from SQL calls. Never overwrite source evidence or output files.
+- Isolate openpyxl in the optional `excel` extra and load it only for export.
+
+Status: Delivery 03 only. Cost simulation, HITL, real sources and LLM additions
+remain deferred. See `DELIVERY_03.md` for sample values, states and verification.

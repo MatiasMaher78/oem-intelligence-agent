@@ -50,6 +50,14 @@ compatibility axes and preserves every selected piece. Each query has SQL,
 parameters and success/error trace evidence; failed source reads produce partial
 coverage rather than empty-success claims. Cataloguing remains unassessed.
 
+## Stage 2 Delivery 03
+
+[Delivery 03](DELIVERY_03.md) reuses matching in `stage3_statistics`, adding exact
+percentiles and a complete source-offer audit read. `stage3_fixtures` supplies a
+separate sufficient-sample database. `excel_export` is an optional presentation
+adapter with exclusive file creation; the numerical pipeline has no new runtime
+dependency. Source/matching evidence is preserved alongside calculation traces.
+
 ## Upgrade paths (do not implement prematurely)
 
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.

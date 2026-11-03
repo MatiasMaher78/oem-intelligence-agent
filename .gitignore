@@ -58,6 +58,7 @@ report.json
 report.md
 trace.jsonl
 llm_notes_UNVERIFIED.md
+*.xlsx
 
 # Temporary files, logs and desktop metadata
 /tmp/

@@ -44,6 +44,11 @@ Delivery 02 adds `python -m oem_agent.stage2 match` over the same database and
 for both synthetic marketplaces, including empty retrievals and SQL errors.
 See [Delivery 02](docs/DELIVERY_02.md) for rules, trace fields and CLI exit codes.
 
+Delivery 03 adds `stats` with demonstrative P10/P90 filtering, a configurable
+minimum of ten usable offers, and optional audited Excel export via `.[excel]`.
+`seed-stats` provides a separate sufficient-sample scenario; the old seed is
+unchanged. See [Delivery 03](docs/DELIVERY_03.md) for commands and expected values.
+
 ### Optional: first LLM tool-calling agent
 
 ```powershell
