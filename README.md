@@ -49,6 +49,11 @@ minimum of ten usable offers, and optional audited Excel export via `.[excel]`.
 `seed-stats` provides a separate sufficient-sample scenario; the old seed is
 unchanged. See [Delivery 03](docs/DELIVERY_03.md) for commands and expected values.
 
+Delivery 04 adds a separate `python -m oem_agent.stage4` CLI for invented DEMO
+costs and local review revisions. Decisions include operator metadata and bind
+to evidence/parameter fingerprints; changed evidence requires renewed review.
+See [Delivery 04](docs/DELIVERY_04.md) for eligibility gates, states and examples.
+
 ### Optional: first LLM tool-calling agent
 
 ```powershell

@@ -54,6 +54,8 @@ secrets.*
 # Generated reports and traces (examples/demo_report.md is source documentation)
 /runs/
 /reports/
+/reviews/
+*.review.json
 report.json
 report.md
 trace.jsonl

@@ -58,6 +58,14 @@ separate sufficient-sample database. `excel_export` is an optional presentation
 adapter with exclusive file creation; the numerical pipeline has no new runtime
 dependency. Source/matching evidence is preserved alongside calculation traces.
 
+## Stage 2 Delivery 04
+
+Delivery 04 [local review](DELIVERY_04.md) consumes the structured Delivery 03
+artifact in `stage4_review`, without further inventory SQL or mutations. Pure
+DEMO cost calculations are gated by audited evidence; `stage4` writes new JSON
+review revisions with operator decisions, evidence/parameter hashes, review
+epochs and parent/history links. Every effective approval checks current evidence.
+
 ## Upgrade paths (do not implement prematurely)
 
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.

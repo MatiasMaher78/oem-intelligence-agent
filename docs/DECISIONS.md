@@ -68,3 +68,24 @@ Reasons:
 
 Status: Delivery 03 only. Cost simulation, HITL, real sources and LLM additions
 remain deferred. See `DELIVERY_03.md` for sample values, states and verification.
+
+# Architecture Decision Record 005
+
+Decision: Delivery 04 uses invented cost components and immutable, evidence-bound
+local review JSON rather than changing inventory or re-importing Excel values.
+
+Reasons:
+- Reuse and verify structured Delivery 03 evidence, recomputing its statistics
+  with the existing analyzer; preserve its complete SQL/matching/audit trace.
+- Invent a small integer-cent sum and hypothetical quantity rule, without using
+  enterprise formulas, recommending sale prices or changing source data.
+- Block estimates/approval for insufficient or incomplete evidence.
+- Record explicit attributed decisions and all four review states in new revisions.
+- Bind decisions to the whole evidence snapshot, DEMO configuration and review
+  epoch. Changes invalidate approvals; reverting evidence does not revive them.
+- Require current evidence on every view/decision and preserve historical records.
+- Use standard-library JSON/SHA-256 and exclusive file creation; add no services,
+  authentication, inventory SQL writes or new dependencies.
+
+Status: Delivery 04 only. Reviewer identity is self-declared and checksums are
+integrity aids, not signatures. See `DELIVERY_04.md` for limitations and verification.
