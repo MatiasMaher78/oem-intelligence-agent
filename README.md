@@ -60,6 +60,12 @@ read contracts through `stage5_evidence` / `stage5_contracts`. It reuses Deliver
 See [increment 5.1](docs/STAGE_5_1.md) for the Python API, verification, hardware
 recommendation and the design of five separate future evaluation scenarios.
 
+Increment 5.2 adds `ReadOnlyDispatcher` over those contracts, reusing the existing
+harness with charged attempts, restrictive permissions, budgets, error/repetition
+controls, page tracking and local audit exports. It remains entirely offline,
+without a model. See [increment 5.2](docs/STAGE_5_2.md) for simulated calls,
+completion rules, verification and cooperative-timeout limitations.
+
 ### Optional: first LLM tool-calling agent
 
 ```powershell

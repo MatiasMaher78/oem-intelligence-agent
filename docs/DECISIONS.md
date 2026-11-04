@@ -110,3 +110,24 @@ Reasons:
 Status: increment 5.1 only. Windows hardware favors evaluating qwen3:4b first;
 actual latency/quality and acceleration remain unmeasured. The five-scenario
 independent evaluation dataset is documented only. See `STAGE_5_1.md`.
+
+# Architecture Decision Record 007
+
+Decision: add a separate bounded read dispatcher around the existing harness and
+5.1 contracts, preserving all earlier output/count semantics.
+
+Reasons:
+- Count every attempt before validation while retaining a separate execution
+  counter; the original harness counts only calls past its policy gate.
+- Reuse the fixed read allowlist and strict schemas; operators can narrow rights
+  but tools cannot add callbacks, writes, SQL, file access or review decisions.
+- Keep errors sticky, stop exhausted/forbidden/repeated calls and track issued
+  page cursors. Only explicit finalization of a clean session can be complete.
+- Validate result schema, source identity, hashes and references; withhold late,
+  oversized or malformed results without rewriting the underlying evidence.
+- Serialize dispatches and retain rejected attempts in a hash-linked local trace.
+- Use cooperative time checks for these fixed in-memory readers. Do not introduce
+  process orchestration, model/token handling or external services prematurely.
+
+Status: 5.2 only. Model integration and hard cancellation are not implemented.
+See `STAGE_5_2.md` for exact completion semantics, limits and verification.

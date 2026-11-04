@@ -76,6 +76,17 @@ direct projections have explicit pagination, source references and query traces.
 No agent loop, model adapter, CLI or harness budget changes are part of 5.1.
 See [increment documentation](STAGE_5_1.md).
 
+## Stage 5 increment 5.2
+
+`stage5_dispatcher.ReadOnlyDispatcher` wraps the five read projections with the
+unchanged `Harness`. It records attempts before validation, restricts permissions,
+tracks errors and pagination, blocks repeated reads and validates bounded results.
+Only explicit finalization can mark a clean, nonexhausted session complete.
+Outer traces retain rejected calls and errors; operator-only JSON exports use
+exclusive creation. Calls are serialized; time limits are cooperative and late
+results are withheld. No model adapter, CLI or new dependency is introduced.
+See [increment documentation](STAGE_5_2.md).
+
 ## Upgrade paths (do not implement prematurely)
 
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.
