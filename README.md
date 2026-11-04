@@ -54,6 +54,12 @@ costs and local review revisions. Decisions include operator metadata and bind
 to evidence/parameter fingerprints; changed evidence requires renewed review.
 See [Delivery 04](docs/DELIVERY_04.md) for eligibility gates, states and examples.
 
+Stage 5 increment 5.1 adds immutable evidence snapshots and five structured
+read contracts through `stage5_evidence` / `stage5_contracts`. It reuses Delivery
+03 JSON and an optional Delivery 04 revision without DB access or a model.
+See [increment 5.1](docs/STAGE_5_1.md) for the Python API, verification, hardware
+recommendation and the design of five separate future evaluation scenarios.
+
 ### Optional: first LLM tool-calling agent
 
 ```powershell

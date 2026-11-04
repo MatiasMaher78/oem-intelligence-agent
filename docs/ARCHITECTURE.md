@@ -66,6 +66,16 @@ DEMO cost calculations are gated by audited evidence; `stage4` writes new JSON
 review revisions with operator decisions, evidence/parameter hashes, review
 epochs and parent/history links. Every effective approval checks current evidence.
 
+## Stage 5 increment 5.1
+
+`stage5_evidence.EvidenceSnapshot` pins validated Delivery 03 evidence and an
+optional Delivery 04 revision as immutable canonical JSON bytes. It retains
+Delivery 01 selection, Delivery 02 matching and subsequent audit/history rather
+than querying DBs again. `stage5_contracts` describes five strict read contracts;
+direct projections have explicit pagination, source references and query traces.
+No agent loop, model adapter, CLI or harness budget changes are part of 5.1.
+See [increment documentation](STAGE_5_1.md).
+
 ## Upgrade paths (do not implement prematurely)
 
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.

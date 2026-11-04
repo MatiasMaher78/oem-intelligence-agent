@@ -89,3 +89,24 @@ Reasons:
 
 Status: Delivery 04 only. Reviewer identity is self-declared and checksums are
 integrity aids, not signatures. See `DELIVERY_04.md` for limitations and verification.
+
+# Architecture Decision Record 006
+
+Decision: Stage 5 starts with immutable evidence readers and strict read contracts,
+before adding harness orchestration or a real zero-paid-API model adapter.
+
+Reasons:
+- Delivery 03 already retains the earlier selection/matching evidence; use that
+  authoritative JSON plus an explicitly selected optional Delivery 04 revision.
+- Reuse deterministic validators/calculations and check matching/source coverage;
+  never let a reader reinterpret OEMs, statistical gates or human decisions.
+- Keep canonical bytes in frozen snapshots and expose copies, hash-bound JSON
+  Pointers, explicit row pagination and deterministic per-query trace envelopes.
+- Retain incomplete evidence, raw exclusions and absent/zero distinctions. A
+  successful read is separate from successful coverage at the original sources.
+- Do not create a model loop, install a runtime, alter fixtures, add dependencies
+  or grant SQL/filesystem/write capabilities to these contracts.
+
+Status: increment 5.1 only. Windows hardware favors evaluating qwen3:4b first;
+actual latency/quality and acceleration remain unmeasured. The five-scenario
+independent evaluation dataset is documented only. See `STAGE_5_1.md`.
