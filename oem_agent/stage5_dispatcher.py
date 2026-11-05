@@ -159,7 +159,8 @@ class ReadOnlyDispatcher:
                 or result["coverage"] != self._coverage
                 or (result["status"] == "ok" and not self._coverage["complete"])
                 or (result["status"] == "partial" and self._coverage["complete"])
-                or (result["status"] == "not_available" and tool != "review_status")):
+                or (result["status"] == "not_available" and not (tool == "review_status"
+                    or tool == "list_cases" and arguments.get("view") == "costs"))):
             raise _DispatchFault("invalid_tool_result", "Reader returned an invalid or unrelated result", terminal=True)
         trace = result["trace"]
         if (trace["operation"] != tool or trace["arguments"] != arguments or trace["status"] != result["status"]
@@ -246,7 +247,7 @@ class ReadOnlyDispatcher:
                 raise _DispatchFault("tool_timeout", "Validated result exceeded deadline and was discarded", terminal=True)
             if result["status"] == "not_available":
                 self._missing = True
-            if tool in ("list_cases", "list_offers"):
+            if tool in ("list_cases", "list_offers") and result["status"] in ("ok", "partial"):
                 cursor = result["data"]["next_cursor"]
                 if cursor is not None:
                     seen = self._pending.get(scope, {}).get("seen", 0) + result["data"]["returned_rows"]

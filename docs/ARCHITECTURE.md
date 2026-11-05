@@ -87,6 +87,33 @@ exclusive creation. Calls are serialized; time limits are cooperative and late
 results are withheld. No model adapter, CLI or new dependency is introduced.
 See [increment documentation](STAGE_5_2.md).
 
+## Stage 5 increment 5.3
+
+`ollama_local` restricts transport to the loopback native API, checks disabled
+cloud/local-model identity and enforces request/context limits. `stage5_agent`
+lets one Qwen3:4b model select native tools, returning dispatcher projections to
+the conversation; no business-question router exists. Observable audits exclude
+private thinking/intermediate content. The opt-in example prepares three real
+questions with operator-provisioned weights. Protocol simulations precede real
+inference; the original optional SDK demo remains isolated and is never a fallback.
+See [increment documentation](STAGE_5_3.md).
+
+The explicitly selected `groq_hosted` adapter shares that conversation loop via
+`run_groq_agent`. It translates native Groq argument strings/IDs to the existing
+dispatcher representation and returns the same local evidence projections. Its
+fixed HTTPS destination is independent of the unchanged loopback-only client;
+neither adapter falls back to the other. Recent operator-confirmed Free quota
+and synthetic-data transfer authorization are required before inference. The
+account plan cannot be certified by the model catalog API. The third-query fix
+adds an optional paginated cost-review view to list_cases, reusing dossier_view,
+with lossless grouped model projections and measured-prefix prompt estimates.
+Original defaults and five tool names remain; the dispatcher adds only missing-
+dossier handling for this view. No SQL, business-rule, review-decision or permission
+changes. The smoke CLI explicitly loads only
+GROQ_API_KEY/GROQ_MODEL from the ignored root .env via the small standard-library
+`groq_config` loader; an offline mode exposes availability booleans without network.
+See [Groq preparation](STAGE_5_3_GROQ.md).
+
 ## Upgrade paths (do not implement prematurely)
 
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.

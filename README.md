@@ -66,6 +66,27 @@ controls, page tracking and local audit exports. It remains entirely offline,
 without a model. See [increment 5.2](docs/STAGE_5_2.md) for simulated calls,
 completion rules, verification and cooperative-timeout limitations.
 
+Increment 5.3 adds a local-only Ollama adapter and native tool-calling loop for
+`qwen3:4b`, reusing the dispatcher. It has no paid/cloud fallback and never
+provisions its runtime. See [increment 5.3](docs/STAGE_5_3.md) for protocol tests,
+resource limits, required cloud-disable checks and the opt-in three-question
+smoke test. Runtime/model provisioning requires explicit operator authorization
+and remains separate from the agent; offline protocol tests do not prove model quality. The first
+three-question real run timed out without native tool calls; functional model
+validation remains incomplete (details in the increment documentation).
+
+An explicitly selected Groq Free adapter now reuses that same native tool loop,
+dispatcher and five read contracts with `qwen/qwen3.8-27b`. Its smoke CLI loads
+`GROQ_API_KEY` and the fixed `GROQ_MODEL` from the ignored local `.env` without
+extra dependencies; existing process variables win. Use
+`python -m examples.stage5_3_groq_smoke --check-config` for offline booleans only.
+Enter the key directly in a local editor, never in Codex chat. It requires recent
+operator confirmation of Free access/quota and separate synthetic-data transfer authorization, and never
+falls back from Ollama or activates billing. See [Groq preparation](docs/STAGE_5_3_GROQ.md)
+for metadata-only checks, limits, offline tests and the opt-in maximum-three-question
+smoke test. Real Groq availability, latency and accuracy remain unverified until
+the account prerequisites and authorization are supplied.
+
 ### Optional: first LLM tool-calling agent
 
 ```powershell

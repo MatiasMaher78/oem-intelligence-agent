@@ -131,3 +131,78 @@ Reasons:
 
 Status: 5.2 only. Model integration and hard cancellation are not implemented.
 See `STAGE_5_2.md` for exact completion semantics, limits and verification.
+
+# Architecture Decision Record 008
+
+Decision: use one local Qwen3:4b model through native Ollama tool calling over the
+existing dispatcher, with no provider fallback or automatic provisioning.
+
+Reasons:
+- Model output chooses tools; Python only validates, dispatches and accounts for
+  bounded calls. Do not parse assistant prose as executable instructions.
+- Require loopback transport, disabled server cloud, a pinned local digest/tool
+  capability and a version supporting explicit no-truncation/no-shift flags.
+- Keep model/HTTP/time/context controls separate from deterministic business
+  evidence. Final prose is advisory and is not a verified numerical fact source.
+- Do not persist thinking fields or intermediate assistant content. Preserve
+  observable requests, results, token/time metrics and sanitized failures.
+- Begin with 4096 context tokens and CPU execution for the inspected 8 GB-class
+  machine; measure resource use only after explicit provisioning authorization.
+- Prepare three smoke questions using existing data; defer the five-scenario
+  dataset, broad evaluations and general product CLI to later increments.
+
+Status: 5.3 local native loop; runtime/model provisioning is a separate operator
+action. See `STAGE_5_3.md` for simulated and real verification and its limitations.
+
+# Architecture Decision Record 009
+
+Decision: add an explicitly selected Groq Free transport for qwen/qwen3.8-27b,
+sharing the existing Stage 5.3 conversation loop and local dispatcher. Preserve
+the local Ollama path, all five contracts and every deterministic business rule.
+
+Reasons:
+- Hosted inference avoids the observed local model RAM constraint. It requires
+  separate operator authorization to transfer only synthetic evidence.
+- Use standard-library HTTPS to one fixed host, with no billing endpoints,
+  external tools, automatic provider/model/tier fallback or dependencies.
+- Strictly normalize native IDs/JSON arguments; charge malformed attempts in the
+  existing dispatcher. Keep bounded context, time, calls and sticky errors.
+- Read GROQ_API_KEY at request time from the process environment. The CLI explicitly
+  loads only the two Groq names from the ignored root .env; existing environment
+  values win, no dependency/interpolation/command execution is added. Keep the
+  fixed model allowlist and an offline boolean configuration check. Never serialize
+  credentials or private reasoning. Keep evidence hashes and normalized tool traces.
+- Public Free caps and model availability do not verify the account's plan or
+  remaining quota. Require recent operator Console confirmation and label that
+  distinction. Record unavailable daily balances as null and enforce a separate
+  bounded local batch budget; known balances still restrict it. Stop at exhaustion,
+  429/authentication errors or unexpected POST limits without retry or upgrade.
+- Preserve the byte guard and reject reported context overflow. Groq exposes no
+  num_ctx; exact pre-inference token accounting is not claimed without a tokenizer.
+- Reuse three existing questions and generate an operator accuracy checklist
+  against deterministic reader results. Offline success does not verify model prose.
+
+Status: protocol implementation and offline verification only. Account-specific
+checks and at most three real questions await prerequisites and authorization.
+See `STAGE_5_3_GROQ.md`.
+
+
+## Stage 5.3 follow-up: close the third cost-review query
+
+Add only list_cases(view=costs) with existing pagination and pinned dossier_view
+facts; preserve the five tool names, ordinary results and 5.1 snapshot identity.
+Per-piece review reads cannot cover 27 pieces in the existing 8-call budget.
+Group repeated facts/reference hashes losslessly for the model, retaining all
+IDs, pointers and full local audit rows. Missing review stays not_available;
+unfinished pagination, partial evidence and errors still prevent completion.
+
+Use reported prompt tokens for an identical transport-message prefix, adding a
+conservative estimate for new bytes/output/framing. Reset to a full-byte estimate
+when prefix/tools change. Keep real consumption distinct from estimated charges,
+including valid usage on failed completions. Do not raise Free quotas or install
+a tokenizer dependency. Native tool_choice remains auto; no question router.
+
+After 268 offline tests, only the authorized third question was repeated: two
+native list_cases calls, 27 pieces / 26 blocked, three inferences, 5264 measured
+tokens, 4.785 seconds, complete and deterministically verified. No business
+rules/decisions, inventory or prices changed; this is a narrow functional check.

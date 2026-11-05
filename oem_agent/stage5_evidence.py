@@ -212,16 +212,28 @@ class EvidenceSnapshot:
                     "review_available": self._dossier is not None}
             return data, [self._ref("")]
         if tool == "list_cases":
+            costs = arguments.get("view") == "costs"
+            view = json.loads(self._view) if costs else None
+            effective = {row["inventory"]["id"]: row for row in view["cases"]} if costs else {}
             rows, refs = [], []
             for offset, case in enumerate(cases):
                 if "oem" in arguments and case["inventory"]["oem"] != arguments["oem"]:
                     continue
                 if "evidence_status" in arguments and case["statistics"]["evidence_status"] != arguments["evidence_status"]:
                     continue
-                rows.append({"inventory": case["inventory"], "evidence_status": case["statistics"]["evidence_status"],
-                             "matching_complete": case["matching_complete"], "has_confirmed_match": case["has_confirmed_match"]})
+                if costs:
+                    current = effective[case["inventory"]["id"]]
+                    rows.append({"inventory_id": current["inventory"]["id"], **{
+                        key: current[key] for key in ("eligible", "block_reasons", "review_state")}})
+                else:
+                    rows.append({"inventory": case["inventory"], "evidence_status": case["statistics"]["evidence_status"],
+                                 "matching_complete": case["matching_complete"], "has_confirmed_match": case["has_confirmed_match"]})
                 refs.append(self._ref(f"/results/{offset}"))
-            return self._page(tool, arguments, rows, refs, "selected_inventory")
+            data, refs = self._page(tool, arguments, rows, refs, "selected_cost_review" if costs else "selected_inventory")
+            if costs:
+                data["needs_refresh"] = view["needs_refresh"]
+                refs.append(self._ref("", "dossier"))
+            return data, refs
         if tool == "inspect_case":
             section = arguments.get("section", "statistics")
             refs = [self._ref(f"/results/{index}")]
@@ -287,12 +299,14 @@ class EvidenceSnapshot:
                 validate_arguments(tool, request)
             except (ValueError, TypeError) as exc:
                 raise EvidenceError("invalid_arguments", str(exc)) from exc
-            if tool == "review_status" and self._view is None:
-                self._case(evidence, request["inventory_id"])
+            costs = tool == "list_cases" and request.get("view") == "costs"
+            if (tool == "review_status" or costs) and self._view is None:
+                if tool == "review_status":
+                    self._case(evidence, request["inventory_id"])
                 response.update({"status": "not_available", "warnings": [*response["warnings"], "review_not_provided"]})
             else:
                 response["data"], response["references"] = self._read(tool, request, evidence)
-                if tool == "review_status" and response["data"]["needs_refresh"]:
+                if (tool == "review_status" or costs) and response["data"]["needs_refresh"]:
                     response["warnings"].append("review_evidence_changed")
         except EvidenceError as exc:
             response.update({"status": "error", "data": None, "references": [],

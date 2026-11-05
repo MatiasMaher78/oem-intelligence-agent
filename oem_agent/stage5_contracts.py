@@ -52,18 +52,26 @@ def _output(data):
     })
 
 
+_COST_PAGE = _page_output(_object({"inventory_id": ID, "eligible": BOOLEAN,
+                                  "block_reasons": {"type": "array", "items": TEXT},
+                                  "review_state": TEXT}))
+_COST_PAGE["properties"]["needs_refresh"] = BOOLEAN
+_COST_PAGE["required"].append("needs_refresh")
+
+
 _CONTRACTS = {
     "summarize_run": ("Summarize selected synthetic evidence and source coverage.", _object({}),
                       _object({"selection": RAW, "marketplaces": {"type": "array", "items": TEXT},
                                "evidence_status_counts": RAW, "marketplace_status_counts": RAW,
                                "source_offers_count": {"type": ["integer", "null"]},
                                "review_available": BOOLEAN})),
-    "list_cases": ("List every matching selected piece through explicit pagination; OEM is literal text.",
+    "list_cases": ("List selected pieces, pages up to 20; OEM literal. view=costs reads DEMO cost eligibility/block reasons and human review state from the pinned dossier. Continue cursors until done.",
                    _object({**PAGE_INPUT, "oem": {"type": "string", "minLength": 1},
-                            "evidence_status": {"enum": list(EVIDENCE_STATES)}}, []),
-                   _page_output(_object({"inventory": INVENTORY, "evidence_status": TEXT,
+                            "evidence_status": {"enum": list(EVIDENCE_STATES)},
+                            "view": {"enum": ["inventory", "costs"]}}, []),
+                   {"anyOf": [_page_output(_object({"inventory": INVENTORY, "evidence_status": TEXT,
                                          "matching_complete": BOOLEAN,
-                                         "has_confirmed_match": {"type": ["boolean", "null"]}}))),
+                                         "has_confirmed_match": {"type": ["boolean", "null"]}})), _COST_PAGE]}),
     "inspect_case": ("Read inventory, matching summaries, statistics or source traces for one selected ID.",
                      _object({"inventory_id": ID, "section": {"enum": ["inventory", "matching", "statistics", "trace"]}},
                              ["inventory_id"]),
