@@ -1,5 +1,9 @@
 # Stage 5.3: explicitly selected Groq Free adapter
 
+Historical 5.3 implementation/verification record, accepted in commit 20fbc6b.
+Current runtime instructions and provenance are maintained in [5.4](STAGE_5_4.md)
+and its sole packaged skill; this history is not sent to the LLM.
+
 This increment adds `groq_hosted.GroqClient` with standard-library HTTPS. Both
 `run_local_agent` and `run_groq_agent` use the same private conversation loop in
 `stage5_agent`. The five tool names, original default results, Harness permissions,

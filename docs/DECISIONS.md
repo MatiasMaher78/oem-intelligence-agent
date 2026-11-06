@@ -1,3 +1,9 @@
+# Decision history
+
+Each record describes its increment when authored; deferred features in an older
+record are historical. Current Stage 5 runtime instructions have one versioned
+source (the packaged OEM evidence skill); these records are not model context.
+
 # Architecture Decision Record 001
 
 Decision: deterministic evidence pipeline first, optional single LLM reviewer second.
@@ -182,8 +188,9 @@ Reasons:
 - Reuse three existing questions and generate an operator accuracy checklist
   against deterministic reader results. Offline success does not verify model prose.
 
-Status: protocol implementation and offline verification only. Account-specific
-checks and at most three real questions await prerequisites and authorization.
+Initial status: protocol implementation and offline verification. The subsequent
+controlled Groq runs below completed three questions; 5.3 is accepted in commit
+20fbc6b. No additional provider call is authorized by this decision record.
 See `STAGE_5_3_GROQ.md`.
 
 
@@ -206,3 +213,25 @@ After 268 offline tests, only the authorized third question was repeated: two
 native list_cases calls, 27 pieces / 26 blocked, three inferences, 5264 measured
 tokens, 4.785 seconds, complete and deterministically verified. No business
 rules/decisions, inventory or prices changed; this is a narrow functional check.
+
+
+# Architecture Decision Record 010
+
+Decision: consolidate the Stage 5 runtime instructions in one packaged skill,
+with explicit configuration identity and verifiable answer-source references.
+
+- Replace the two obsolete standalone skills with oem-evidence-review v1.0.0.
+  Their original-demo selection/market assumptions are not current agent rules.
+  Use existing structured evidence rather than copying SQL thresholds or math.
+- Load only the skill body; preserve model-selected native calls, five contracts,
+  local dispatcher permissions, provider choice and execution budgets.
+- Record configuration v5.4.0 and its SHA-256, exact skill/prompt/schema identities,
+  provider/model and allowlisted limits. Never dump environment or credentials.
+- Attach only accepted, resolvable snapshot references to answers. R labels and
+  structured JSON Pointers support verification; they do not validate prose.
+  Preserve semantic answer_verified=false and incomplete/error distinctions.
+- Keep the original deterministic/optional SDK demo isolated. Historic documents
+  remain history, not extra instructions. Include the sole skill in package data.
+- Verify offline; Stage 5.4 makes no new real-provider call without authorization.
+
+Status: local implementation pending review. See STAGE_5_4.md.

@@ -1,5 +1,9 @@
 # Stage 5 increment 5.3: local Ollama native tool loop
 
+Historical 5.3 implementation/verification record, accepted in commit 20fbc6b.
+Current runtime instructions and provenance are maintained in [5.4](STAGE_5_4.md)
+and its sole packaged skill; this history is not sent to the LLM.
+
 This increment implements a single advisory agent using `qwen3:4b` through the
 native Ollama HTTP API. `ollama_local` supplies the local-only transport;
 `stage5_agent` supplies the bounded conversation loop. Existing readers,
@@ -205,7 +209,7 @@ The native schemas were sent to /api/chat, but no model tool call or final answe
 arrived within the 45-second request limit. All three reports remain error /
 complete=false, with absent answers. There was no provider fallback, generated
 business result or retry of a question. **Successful real native tool selection
-has not yet been demonstrated.** Protocol simulation success must not be read as
+was not demonstrated for this Ollama model/hardware combination.** Protocol simulation success must not be read as
 functional acceptance of this model/hardware combination.
 
 The observer sampled /api/ps and Windows process memory. Ollama listed the model

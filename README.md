@@ -84,10 +84,12 @@ Enter the key directly in a local editor, never in Codex chat. It requires recen
 operator confirmation of Free access/quota and separate synthetic-data transfer authorization, and never
 falls back from Ollama or activates billing. See [Groq preparation](docs/STAGE_5_3_GROQ.md)
 for metadata-only checks, limits, offline tests and the opt-in maximum-three-question
-smoke test. Real Groq availability, latency and accuracy remain unverified until
-the account prerequisites and authorization are supplied.
+smoke test. Stage 5.3 was accepted with three correct real business answers;
+see the recorded limits and evidence in that document. Stage 5.4 consolidates the
+runtime skill and adds configuration identity and verified source references:
+[current context and trace](docs/STAGE_5_4.md). No new real inference is implied.
 
-### Optional: first LLM tool-calling agent
+### Historical original demo: optional SDK reviewer (isolated)
 
 ```powershell
 python -m venv .venv
@@ -118,7 +120,7 @@ oem_agent/db.py          SQLite schema, synthetic fixtures, readonly SQL
 oem_agent/rules.py       Business gates and priority
 oem_agent/harness.py     Tool allowlist, budget, local audit trail, output
 oem_agent/llm_agent.py   Optional real SDK agent with restricted tools
-skills/*/SKILL.md       Two portable procedural skills
+oem_agent/skills/oem-evidence-review/SKILL.md  Single versioned runtime skill
 AGENTS.md               Instructions for your coding assistant
 .github/workflows/      Offline CI; schedule disabled until approved
 tests/                  Deterministic verification

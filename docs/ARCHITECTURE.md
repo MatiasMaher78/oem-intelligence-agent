@@ -1,5 +1,10 @@
 # Architecture and explicit agent anatomy
 
+The diagram and first interfaces below describe the isolated original demo.
+The current five-tool agent is described in the Stage 5 sections.
+
+## Original demo
+
 ```mermaid
 flowchart TD
   A[Pure synthetic SQLite inventory] --> B[SQL: candidates]
@@ -113,6 +118,22 @@ changes. The smoke CLI explicitly loads only
 GROQ_API_KEY/GROQ_MODEL from the ignored root .env via the small standard-library
 `groq_config` loader; an offline mode exposes availability booleans without network.
 See [Groq preparation](STAGE_5_3_GROQ.md).
+
+## Stage 5 increment 5.4
+
+The sole runtime instruction source is the packaged, versioned
+`oem_agent/skills/oem-evidence-review/SKILL.md`. `stage5_context` loads its body
+once; AGENTS.md, history documents, frontmatter and retired skills never enter
+model context. The existing shared native loop and five contracts are unchanged.
+
+Every report binds the actual skill/prompt, schemas, selected provider/model and
+safe effective limits to a configuration version/hash. The existing detailed
+traces retain tools, real/estimated tokens, timing and sanitized failures.
+Accepted tool references are deduplicated and resolved in the immutable snapshot,
+attached as answer_references and identified by local R labels in the answer.
+Missing/invalid sources prevent a complete answer. Reference integrity does not
+validate model claims; advisory_only/answer_verified=false and partial coverage
+semantics are retained. See [5.4 details](STAGE_5_4.md).
 
 ## Upgrade paths (do not implement prematurely)
 

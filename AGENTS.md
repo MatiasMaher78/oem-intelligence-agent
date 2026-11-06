@@ -22,3 +22,13 @@ Teach AI Agent / LLM / harness engineering on synthetic automotive OEM inventory
 - Feature is demonstrated with a fresh synthetic DB.
 - Offline tests pass and outputs contain source evidence and an execution trace.
 - Documentation and public-safe status are updated.
+
+
+## Instruction ownership
+- This file governs repository work and is not sent to the runtime model.
+- The current Stage 5 agent loads only `oem_agent/skills/oem-evidence-review/SKILL.md`
+  as its instructions. Update that versioned source instead of copying a prompt.
+- Python contracts/dispatcher define permissions and bounds; a skill grants none.
+- Earlier delivery/decision documents describe their historical increment. The
+  original two-tool SDK demo is isolated from the current five-tool agent.
+- Current context, provenance and source-reference semantics: `docs/STAGE_5_4.md`.

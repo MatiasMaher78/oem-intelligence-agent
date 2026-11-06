@@ -15,3 +15,6 @@ llm = ["openai-agents"]
 
 [tool.setuptools.packages.find]
 include = ["oem_agent*"]
+
+[tool.setuptools.package-data]
+oem_agent = ["skills/*/SKILL.md"]
