@@ -10,7 +10,8 @@ configuration format remains 5.4.0 and fingerprints the effective skill and limi
 The five contracts, dispatcher permissions, SQL, business math, inventory prices
 and human-review decisions are unchanged. No provider, framework or dependency
 was added. Publication corrections update documentation and CI only. Stage 5.5
-remains uncommitted pending review.
+is technically closed and recorded in Git commit
+`267a8af6904560c0d4bb509712612235b1054b31`.
 
 ## Final technical closure
 
@@ -247,8 +248,9 @@ Detailed final test counts, timings, hashes, preservation/security checks and an
 operator review are under the ignored directory:
 `runs/stage5-5-verification-20261105-f368bf9f/`.
 
-No commit of 5.5 or publication is performed. The existing 27 pieces, six-case
-original demo, statistical/cost/review results and prior real traces are preserved.
+The verification records below describe pre-commit checks; no publication was
+performed. The existing 27 pieces, six-case original demo, statistical/cost/review
+results and prior real traces are preserved.
 
 ## Historical initial offline results (2026-11-05)
 
@@ -380,6 +382,7 @@ Those steps were reproduced locally in the clean Windows environment; the hosted
 Ubuntu/Python 3.11 GitHub Actions job has not been run or claimed as passed.
 
 Detailed local logs and integrity/security checks are retained only in the ignored
-`runs/stage5-5-publication-close-20261107-3ee19604/` directory. No .env was opened or
-printed, no commit was created and no repository was published. Secret-pattern
-scanning is a bounded check, not a guarantee of absence of every secret format.
+`runs/stage5-5-publication-close-20261107-3ee19604/` directory. During that
+verification no .env was opened or printed, and the verification itself created
+no commit or publication. Secret-pattern scanning is a bounded check, not a
+guarantee of absence of every secret format.
