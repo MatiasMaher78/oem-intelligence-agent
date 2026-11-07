@@ -44,7 +44,7 @@ class ContextTests(unittest.TestCase):
     def test_one_bundled_versioned_skill_supplies_compact_prompt(self):
         skill=load_skill()
         self.assertEqual(skill.name,"oem-evidence-review")
-        self.assertEqual(skill.version,"1.0.0")
+        self.assertEqual(skill.version,"1.0.2")
         self.assertEqual(skill.body,SYSTEM_PROMPT)
         self.assertLessEqual(len(SYSTEM_PROMPT.encode("utf-8")),1600)
         self.assertNotIn("metadata:",SYSTEM_PROMPT)
@@ -71,7 +71,7 @@ class ContextTests(unittest.TestCase):
         for kwargs in ({"model":"another-model"},{"limits":asdict(OllamaLimits(output_tokens=256))},
                        {"contracts":tool_contracts()[:-1]}):
             self.assertNotEqual(self.config(**kwargs)[1],digest)
-        self.assertNotEqual(self.config(replace(skill,version="1.0.1"))[1],digest)
+        self.assertNotEqual(self.config(replace(skill,version="1.0.3"))[1],digest)
         self.assertNotEqual(self.config(replace(skill,body=skill.body+" Extra instruction."))[1],digest)
         self.assertEqual(base["version"],CONFIGURATION_VERSION)
 

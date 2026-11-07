@@ -1,8 +1,9 @@
 # Stage 5.3: explicitly selected Groq Free adapter
 
 Historical 5.3 implementation/verification record, accepted in commit 20fbc6b.
-Current runtime instructions and provenance are maintained in [5.4](STAGE_5_4.md)
-and its sole packaged skill; this history is not sent to the LLM.
+Base context/provenance semantics are recorded in [5.4](STAGE_5_4.md); the current
+skill 1.0.2 and closed initial evaluation are documented in [5.5](STAGE_5_5.md).
+This historical record is not sent to the LLM.
 
 This increment adds `groq_hosted.GroqClient` with standard-library HTTPS. Both
 `run_local_agent` and `run_groq_agent` use the same private conversation loop in
@@ -38,9 +39,10 @@ No prose/keyword router or string-to-command interpretation is introduced.
 
 ## Free access and the limits of verification
 
-The public documentation currently lists Free caps of 30 requests/minute,
-1000/day, 8000 tokens/minute and 200000/day for this Preview model. These are
-reference caps, **not verified remaining quota for this user's organization**.
+The controlled runs recorded here used operator-confirmed Free caps of 30
+requests/minute, 1000/day, 8000 tokens/minute and 200000/day. These historical caps
+are **not verified current remaining quota**. Future authorized runs require fresh
+Console confirmation of the plan, billing state and applicable limits.
 The authenticated models endpoint checks availability; it does not certify the
 account plan, enabled billing or current remaining daily allowance. No documented
 read-only plan/remaining-quota endpoint was identified for this implementation.
@@ -145,7 +147,7 @@ with fixed redacted codes, before changing the environment. An existing `.env`
 is never written by the loader. The only supported model is
 `GROQ_MODEL=qwen/qwen3.8-27b`; any other value blocks, without fallback.
 
-Edit `C:\dev\oem-intelligence-agent\.env` directly with a local editor and fill
+Edit `.env` in the repository root directly with a local editor and fill
 `GROQ_API_KEY=` there. Never paste the key into Codex chat, a command argument,
 quota confirmation or report. `.env.example` contains empty credential fields
 and the public model name only. `.gitignore` excludes `.env` and `.env.*`, with

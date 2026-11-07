@@ -37,10 +37,16 @@ def _tool_view(outcome):
             by_document.setdefault(key, []).append(ref["pointer"])
         references = [{"document": doc, "sha256": digest, "pointers": pointers}
                       for (doc, digest), pointers in by_document.items()]
-    return {"status": outcome["status"], "error": outcome["error"], "session": outcome["session"],
+    # Keep the full session/result in the dispatcher audit, not in every model message.
+    view = {"status": outcome["status"], "error": outcome["error"],
+            "calls_remaining": outcome["session"]["calls_remaining"],
             "data": data, "coverage": result["coverage"] if result else None,
-            "references": references,
-            "warnings": result["warnings"] if result else [], "evidence_sha256": outcome["evidence_sha256"]}
+            "references": references, "warnings": result["warnings"] if result else []}
+    # A missing/error result still needs its source identity even without references.
+    if not any(ref["document"] == "evidence" and ref["sha256"] == outcome["evidence_sha256"]
+               for ref in references):
+        view["evidence_sha256"] = outcome["evidence_sha256"]
+    return view
 
 
 def run_local_agent(snapshot: EvidenceSnapshot, question: str, *, limits: OllamaLimits | None = None) -> dict:
@@ -187,6 +193,7 @@ def _run_agent(snapshot, question, *, limits, client, model, provider=None):
               "model_events": events, "http_events": client.events, "resources": resources}
     if provider is not None:
         report["provider"] = provider
+        report["reservation_events"] = client.reservation_events
     report["report_sha256"] = fingerprint(report)
     if interrupted is not None:
         # Preserve sanitized observable audit for an operator catching cancellation.

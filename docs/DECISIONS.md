@@ -234,4 +234,45 @@ with explicit configuration identity and verifiable answer-source references.
   remain history, not extra instructions. Include the sole skill in package data.
 - Verify offline; Stage 5.4 makes no new real-provider call without authorization.
 
-Status: local implementation pending review. See STAGE_5_4.md.
+Status: accepted in local commit 500f3fd. See STAGE_5_4.md.
+
+
+# Architecture Decision Record 011
+
+Decision: evaluate five independent synthetic snapshots with an authored finite
+oracle, using the existing agent, native calls and unchanged five-tool harness.
+
+- IDs/OEM formats/temporary databases are isolated from the 27-piece fixtures.
+  Reuse SQL/matching/math; inject a source error only at the test-source boundary.
+- Use hypothetical prices from questions to illustrate anomaly/competitiveness;
+  do not add inventory prices, commercial thresholds or a classifier.
+- Preserve literal OEM, null/zero, ads/units and independent matching axes.
+  Known source-B offers survive a source-A failure; complete remains false.
+- Grade structured facts, necessary accepted reads, resolvable consulted sources,
+  errors/limits and configuration/trace integrity without a model as judge.
+  Scripted oracle echoes validate the evaluator, not real model intelligence.
+- Keep free-form prose review manual and answer_verified=false. Negative controls
+  and scorer mutations are required to expose false passing cases.
+- Keep any real Groq batch at most three questions behind separate authorization,
+  fresh quota confirmation and shared existing budgets. Stop on failed/incomplete
+  execution; no automatic retries, billing changes or provider fallback.
+- Authorized follow-ups compact tool results from the first read, removing only
+  redundant metadata; retain full local audit, facts, IDs, coverage, errors and
+  hash-bound references. Record reservations before validation and distinguish
+  estimated bounds from real token consumption. Preserve every Free/harness cap.
+- Add matching aggregates over existing audited labels and unique source/offer
+  identities, retaining IDs, exhaustive references and granular list_offers.
+  The E2 rubric accepts verified exhaustive aggregates or complete granular reads;
+  its ground truth and exactness requirements are unchanged.
+- Version the sole skill as 1.0.2 to explain the aggregate and stop further reads
+  when requested dimensions have sufficient evidence. Keep native LLM selection,
+  five contracts, dispatcher permissions and deterministic commercial rules.
+
+Status: initial evaluation technically closed. Offline: 359/359 tests, 5/5
+scripted cases and 12/12 negative controls. E1 real approved (10/10 fields, skill
+1.0.1); E2 and E5 real partial/not approved (skill 1.0.2). Neither offline passes
+nor this small, mixed-version real sample imply statistical LLM reliability.
+References verify sources, not semantic accuracy; no commercial action is automatic.
+E2/E5 are closed without further runs or optimizations. Publication corrections
+change documentation/CI only. No new inference, commit or publication is authorized
+by this record. See STAGE_5_5.md.

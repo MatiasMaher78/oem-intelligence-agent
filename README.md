@@ -11,11 +11,25 @@ A hands-on repo to learn **SQL / Python ETL / agent anatomy / tools / skills / h
 
 ## Quick start (Windows PowerShell, Python 3.11+)
 
+From a fresh checkout, create an isolated environment and install the existing
+Excel extra so all 11 XLSX tests execute instead of being skipped:
+
 ```powershell
-python -m oem_agent seed
-python -m oem_agent run --mode rules --out runs/first-run
-python -m unittest discover -s tests -v
+python -m venv .venv
+.venv\Scripts\python -m pip install -e ".[excel]"
+.venv\Scripts\python -W error::ResourceWarning -m unittest discover -s tests -v
+.venv\Scripts\python -m oem_agent.stage5_eval offline --out runs/eval-5-5-offline-01
+.venv\Scripts\python -m oem_agent seed
+.venv\Scripts\python -m oem_agent run --mode rules --out runs/first-run
 ```
+
+No API key, `.env`, running model or paid service is needed for these commands.
+Installing the extra may download Python packages; the tests and offline evaluator
+use synthetic local fixtures and simulated protocol responses. The core rules
+workflow needs only the standard library; Excel remains optional for that workflow.
+CI installs `.[excel]`, verifies its import and runs the full suite plus the offline
+evaluator. Use a new output directory for each evaluation; do not reset an existing
+DB just to repeat verification.
 
 Open `data/demo.sqlite` in **DB Browser for SQLite** to practice SQL. Files generated: `runs/first-run/report.json`, `report.md`, `trace.jsonl`. Reruns need a new `--out` path (no overwrite).
 
@@ -89,6 +103,36 @@ see the recorded limits and evidence in that document. Stage 5.4 consolidates th
 runtime skill and adds configuration identity and verified source references:
 [current context and trace](docs/STAGE_5_4.md). No new real inference is implied.
 
+### Reproducible evaluation (Stage 5.5)
+
+Five independent synthetic scenarios reuse the current agent and five tools,
+with authored ground truth and no changes to the existing 27 pieces.
+
+The quick start above runs the complete offline evaluation. The current skill is
+**1.0.2**. Stage 5.5 also records the authorized compact tool-result projection,
+pre-validation quota-reservation traces and exhaustive matching aggregates; native
+model tool selection, the five read contracts and business rules are preserved.
+
+The initial evaluation is closed with the following results. Real rows describe
+the latest authorized execution of each scenario, not all historical attempts:
+
+| Evaluation | Skill | Closed result |
+| --- | --- | --- |
+| Offline | 1.0.2 | **359/359 tests, 5/5 scripted scenarios, 12/12 negative controls** |
+| E1 real, Groq Free | 1.0.1 | **Approved: 10/10 structured fields correct**, complete final answer |
+| E2 real, Groq Free | 1.0.2 | **Partial / not approved**: additional exploration and preventive quota block |
+| E5 real, Groq Free | 1.0.2 | **Partial / not approved**: blocked before tool results could be sent back to the model |
+
+Offline success validates protocols, deterministic facts and harness controls; it
+is not measured LLM accuracy. The real sample is small, uses different skill
+versions and establishes no statistical reliability percentage. E5 retained its
+known offers and source-error evidence locally, but produced no final answer.
+Valid references establish source integrity, not semantic correctness. Preventive
+Free quota controls may withhold otherwise useful answers. No automatic commercial
+operation is authorized. No further E2/E5 run or optimization is part of this close.
+See [dataset, final results and limitations](docs/STAGE_5_5.md). Any future real
+inference requires separate authorization and fresh Free-plan/quota confirmation.
+
 ### Historical original demo: optional SDK reviewer (isolated)
 
 ```powershell
@@ -133,7 +177,18 @@ docs/                   Architecture, learning labs, public-safety checklist
 
 ## Technical boundaries
 
-No external scraping, real production data, network connectors or user accounts. No database writes outside explicit `seed --reset` on your selected demo DB. Running `--mode rules` uses standard-library Python only. Run a separate risk assessment before any real integration.
+All inventory, OEM references, offers, prices and costs are synthetic or DEMO.
+There is no live marketplace scraping or connection to business systems. Fixture
+creation is an explicit operator action; the original demo permits replacement
+only with `seed --reset` on the selected demo DB. Agent tools read pinned evidence
+and cannot change inventory/prices, record human decisions or execute commercial
+actions. The separate local DEMO review CLI requires explicit operator input.
+
+The rules workflow and offline evaluator make no provider request. Groq inference
+is hosted and opt-in, sends only authorized synthetic context, and has no paid
+fallback; account plan/billing confirmation remains the operator's responsibility.
+The historical paid SDK example is isolated from this path. Run a separate risk
+assessment before any real-data integration.
 
 ## Developer-oriented sources
 

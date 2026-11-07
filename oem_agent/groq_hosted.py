@@ -86,6 +86,7 @@ class GroqClient:
         self._budget = local_budget or LocalBudget()
         self._authorized = allow_synthetic_transfer
         self._events = []
+        self._reservation_events = []
         self._window = []
         self._used_requests = self._used_tokens = self._reported_tokens = 0
         self._prompt_basis = None
@@ -103,17 +104,57 @@ class GroqClient:
                 "remaining_requests": self._budget.max_requests-self._used_requests,
                 "remaining_tokens": self._budget.max_tokens-self._used_tokens}
 
-    def _check_daily_budget(self, requests=0, tokens=0):
-        if (self._used_requests+requests > self._budget.max_requests
-                or self._used_tokens+tokens > self._budget.max_tokens):
+    @property
+    def reservation_events(self):
+        return deepcopy(self._reservation_events)
+
+    def _check_daily_budget(self, requests=0, tokens=0, *, observation=None):
+        local = {"local_requests": self._used_requests+requests > self._budget.max_requests,
+                 "local_tokens": self._used_tokens+tokens > self._budget.max_tokens}
+        if any(local.values()):
+            if observation is not None:
+                observation["blocked_by"] = [name for name, blocked in local.items() if blocked]
             raise GroqError("local_budget_exhausted")
-        if (self._used_requests+requests > self._quota.requests_per_day
-                or self._used_tokens+tokens > self._quota.tokens_per_day
-                or self._quota.remaining_requests_day is not None
-                and self._used_requests+requests > self._quota.remaining_requests_day
-                or self._quota.remaining_tokens_day is not None
-                and self._used_tokens+tokens > self._quota.remaining_tokens_day):
+        daily = {"daily_requests_cap": self._used_requests+requests > self._quota.requests_per_day,
+                 "daily_tokens_cap": self._used_tokens+tokens > self._quota.tokens_per_day,
+                 "daily_requests_remaining": self._quota.remaining_requests_day is not None
+                     and self._used_requests+requests > self._quota.remaining_requests_day,
+                 "daily_tokens_remaining": self._quota.remaining_tokens_day is not None
+                     and self._used_tokens+tokens > self._quota.remaining_tokens_day}
+        if any(daily.values()):
+            if observation is not None:
+                observation["blocked_by"] = [name for name, blocked in daily.items() if blocked]
             raise GroqError("free_quota_exhausted")
+
+    def _reservation_state(self, now):
+        active = [(t, n) for t, n in self._window if now-t < 60]
+        quota = self._quota
+        return {"local_batch_budget": self.budget_status,
+                "minute_window": {"requests": len(active), "charged_tokens": sum(n for _, n in active),
+                                  "requests_limit": quota.requests_per_minute if quota else None,
+                                  "tokens_limit": quota.tokens_per_minute if quota else None},
+                "free_daily": {"requests_cap": quota.requests_per_day if quota else None,
+                               "tokens_cap": quota.tokens_per_day if quota else None,
+                               "remaining_requests": quota.remaining_requests_day if quota else None,
+                               "remaining_tokens": quota.remaining_tokens_day if quota else None},
+                "remote_last_observed": {"remaining_requests": self._remote_remaining_requests,
+                                         "remaining_tokens": self._remote_remaining_tokens}}
+
+    def _reservation_event(self, amount, *, estimated_prompt=None, basis=None,
+                           context_bytes=None, translated_bytes=None, new_bytes=None):
+        # Allowlisted numbers/codes only. Never messages, arguments, headers or private reasoning.
+        event = {"sequence": len(self._reservation_events)+1, "reserved_tokens": amount,
+                 "estimated_prompt_tokens": estimated_prompt, "reservation_basis": basis,
+                 "output_reservation": self.limits.output_tokens if estimated_prompt is not None else None,
+                 "safety_reservation": 512 if estimated_prompt is not None else None,
+                 "context_bytes": context_bytes, "translated_context_bytes": translated_bytes,
+                 "new_context_bytes": new_bytes,
+                 "measured_prefix_tokens": self._prompt_basis["prompt_tokens"]
+                     if basis == "reported_prompt_plus_new_bytes" else None,
+                 "before": self._reservation_state(monotonic()),
+                 "stage": "reservation", "status": "checking", "error": None, "blocked_by": []}
+        self._reservation_events.append(event)
+        return event
 
     def _request(self, method, path, payload, deadline):
         if (method, path) not in {("GET", "/openai/v1/models"), ("POST", _PATH)}:
@@ -213,31 +254,49 @@ class GroqClient:
         return {"provider": "groq", "endpoint": ENDPOINT, "model": MODEL, "context_capacity": context,
                 "active": True, "free_plan_api_verified": False}
 
-    def preflight(self, deadline):
+    def preflight(self, deadline, *, observation=None):
         if self._quota is None:
             raise GroqError("free_quota_confirmation_required")
         self._quota.check_fresh()
-        self._check_daily_budget(requests=1, tokens=1)
+        self._check_daily_budget(requests=1, tokens=1, observation=observation)
         info = self.availability(deadline)
         info["operator_confirmed_free_quota"] = asdict(self._quota)
         info["local_batch_budget"] = self.budget_status
         return info
 
-    def _reserve(self, amount):
-        if self._quota is None:
-            raise GroqError("free_quota_confirmation_required")
-        self._quota.check_fresh()
-        self._check_daily_budget(requests=1, tokens=amount)
-        now = monotonic()
-        self._window = [(t, n) for t, n in self._window if now-t < 60]
-        if (len(self._window) >= self._quota.requests_per_minute
-                or sum(n for _, n in self._window)+amount > self._quota.tokens_per_minute
-                or self._remote_remaining_requests is not None and self._remote_remaining_requests < 1
-                or self._remote_remaining_tokens is not None and self._remote_remaining_tokens < amount):
-            raise GroqError("free_quota_exhausted")
-        self._window.append((now, amount))
-        self._used_requests += 1
-        self._used_tokens += amount
+    def _reserve(self, amount, *, observation=None):
+        # The record exists before any quota validation, including failed reservations.
+        if observation is None:
+            observation = self._reservation_event(amount)
+        else:
+            observation["before"] = self._reservation_state(monotonic())
+        observation["stage"] = "reservation"
+        try:
+            if self._quota is None:
+                raise GroqError("free_quota_confirmation_required")
+            self._quota.check_fresh()
+            self._check_daily_budget(requests=1, tokens=amount, observation=observation)
+            now = monotonic()
+            self._window = [(t, n) for t, n in self._window if now-t < 60]
+            observation["before"]["minute_window"] = self._reservation_state(now)["minute_window"]
+            limits = {"requests_per_minute": len(self._window) >= self._quota.requests_per_minute,
+                      "tokens_per_minute": sum(n for _, n in self._window)+amount > self._quota.tokens_per_minute,
+                      "remote_requests_remaining": self._remote_remaining_requests is not None
+                          and self._remote_remaining_requests < 1,
+                      "remote_tokens_remaining": self._remote_remaining_tokens is not None
+                          and self._remote_remaining_tokens < amount}
+            if any(limits.values()):
+                observation["blocked_by"] = [name for name, blocked in limits.items() if blocked]
+                raise GroqError("free_quota_exhausted")
+            self._window.append((now, amount))
+            self._used_requests += 1
+            self._used_tokens += amount
+            observation["status"] = "allowed"
+        except GroqError as exc:
+            observation["status"], observation["error"] = "blocked", exc.code
+            if not observation["blocked_by"]:
+                observation["blocked_by"] = [exc.code]
+            raise
 
     @staticmethod
     def _messages(messages):
@@ -277,18 +336,31 @@ class GroqClient:
         if not self._authorized:
             raise GroqError("synthetic_transfer_not_authorized")
         context_bytes = len(encode({"messages": messages, "tools": tools}))
-        if context_bytes > 4*(self.limits.context_tokens-self.limits.output_tokens):
-            raise GroqError("context_budget_exceeded")
-        self.preflight(deadline)  # Active model and recent Free confirmation before every inference.
         translated = self._messages(messages)
         estimated_prompt, reservation_basis, prompt_basis = self._estimate_prompt(translated, tools)
+        reserved = estimated_prompt + self.limits.output_tokens + 512
+        observation = self._reservation_event(reserved, estimated_prompt=estimated_prompt, basis=reservation_basis,
+            context_bytes=context_bytes, translated_bytes=prompt_basis["bytes"],
+            new_bytes=max(0, prompt_basis["bytes"]-self._prompt_basis["bytes"])
+                if reservation_basis == "reported_prompt_plus_new_bytes" else None)
+        try:
+            observation["stage"] = "context"
+            if context_bytes > 4*(self.limits.context_tokens-self.limits.output_tokens):
+                observation["blocked_by"] = ["context_bytes"]
+                raise GroqError("context_budget_exceeded")
+            observation["stage"] = "preflight"
+            self.preflight(deadline, observation=observation)  # Active model and recent Free confirmation.
+            self._reserve(reserved, observation=observation)
+        except GroqError as exc:
+            observation["status"], observation["error"] = "blocked", exc.code
+            if not observation["blocked_by"]:
+                observation["blocked_by"] = [exc.code]
+            raise
         payload = {"model": MODEL, "messages": translated, "tools": tools,
                    "tool_choice": "auto", "stream": False, "n": 1, "temperature": 0,
                    "max_completion_tokens": self.limits.output_tokens, "reasoning_effort": "none",
                    "reasoning_format": "hidden", "service_tier": "on_demand"}
         # Keep estimated reservations separate from actual provider usage.
-        reserved = estimated_prompt + self.limits.output_tokens + 512
-        self._reserve(reserved)
         frame = self._request("POST", _PATH, payload, deadline)
         if frame.get("model") != MODEL or frame.get("object") != "chat.completion":
             raise GroqError("invalid_chat_response")

@@ -200,6 +200,33 @@ class EvidenceSnapshot:
         return {"scope": scope, "items": rows[start:end], "total_rows": len(rows),
                 "returned_rows": end - start, "next_cursor": cursor(end) if end < len(rows) else None}, references[start:end] or [self._ref("")]
 
+    def _offer_summary(self, evidence, index, case):
+        """Count unique source identities, using audited classifications without recomputing them."""
+        complete = evidence["audit_complete"] and case["matching_complete"]
+        groups, identities = {}, {}
+        for offset, row in enumerate(case["offer_audit"]):
+            offer = row["offer"]
+            identity = (row["source_marketplace_id"], offer.get("offer_id"))
+            if (not all(isinstance(value, str) and value.strip() for value in identity)
+                    or offer.get("marketplace_id") != identity[0]):
+                raise EvidenceError("unidentifiable_offer", "Use granular audit for offers without a valid source identity")
+            classification = (row["oem_match"], row["compatibility"])
+            if identity in identities and identities[identity] != classification:
+                raise EvidenceError("ambiguous_offer_identity", "One offer identity has conflicting audited classifications")
+            if classification not in groups:
+                groups[classification] = {"oem_match": classification[0], "compatibility": classification[1],
+                    "count": 0, "offer_ids": {}, "references": [],
+                    "scope": "case", "coverage_complete": complete}
+            group = groups[classification]
+            group["references"].append(self._ref(f"/results/{index}/offer_audit/{offset}"))
+            if identity not in identities:
+                group["offer_ids"].setdefault(identity[0], []).append(identity[1])
+                group["count"] += 1
+            identities[identity] = classification
+        return {"scope": "case_unique_offer_ids", "coverage_complete": complete,
+                "audit_rows_count": len(case["offer_audit"]), "offers_count": len(identities),
+                "groups": list(groups.values())}
+
     def _read(self, tool, arguments, evidence):
         cases = evidence["results"]
         if "inventory_id" in arguments:
@@ -246,6 +273,9 @@ class EvidenceSnapshot:
                 content = {key: case[key] for key in ("matching_complete", "has_confirmed_match", "catalog_status")}
                 content["marketplaces"] = [{key: value for key, value in market.items() if key != "comparisons"}
                                            for market in case["marketplaces"]]
+                content["oem"] = case["inventory"]["oem"]
+                content["offer_summary"] = self._offer_summary(evidence, index, case)
+                refs.append(self._ref(f"/results/{index}/offer_audit"))
             else:
                 content = {"sql_events": [], "statistics_event": evidence["statistics_trace"][index]}
                 refs.append(self._ref(f"/statistics_trace/{index}"))

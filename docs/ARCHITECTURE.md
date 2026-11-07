@@ -135,6 +135,39 @@ Missing/invalid sources prevent a complete answer. Reference integrity does not
 validate model claims; advisory_only/answer_verified=false and partial coverage
 semantics are retained. See [5.4 details](STAGE_5_4.md).
 
+## Stage 5 increment 5.5
+
+The independent evaluation fixture builds five one-piece synthetic databases with
+existing SQL, matching and statistics, then pins snapshots/dossiers. Its explicit
+source fault is confined to fixture construction. SQL, matching classifications,
+prices, percentiles, DEMO costs and human-review rules remain unchanged.
+
+Authorized follow-ups changed read projections and observability: tool responses
+omit redundant session metadata from the first read while retaining business
+facts, IDs, coverage, errors and resolvable references. The full dispatcher audit
+is preserved locally. `inspect_case(section=matching)` adds an exhaustive summary
+of unique source/offer identities by the already audited OEM/compatibility labels,
+with counts, IDs, scope, coverage and references; `list_offers` retains every
+original granular row. No new tool or permission is introduced.
+
+The single runtime skill is now 1.0.2. It explains summary versus granular reads
+and asks the model to finish when all requested dimensions have sufficient
+evidence. Tool choice remains native LLM selection, with no Python question
+routing. Reservation events are recorded before preventive validation, separating
+estimated prompt/output/safety reservations from real provider usage and observed
+remaining quota. The existing 8000 TPM and other Free/harness bounds are preserved;
+a block cannot be presented as a complete execution.
+
+The operator-side evaluator scores authored finite facts, necessary native reads,
+references, source coverage, errors/limits and trace/configuration integrity.
+Closure: 359/359 tests, 5/5 scripted scenarios and 12/12 negative controls; E1 real
+approved (10/10 fields, skill 1.0.1), E2/E5 real partial/not approved (skill 1.0.2).
+Offline success does not measure LLM accuracy. Source references do not establish
+semantic correctness, and the small real sample supports no reliability estimate.
+An E5 final answer can explain partial source coverage, but this real run stopped
+before the model received tool results. No automatic commercial operation exists.
+See [evaluation details and historical records](STAGE_5_5.md).
+
 ## Upgrade paths (do not implement prematurely)
 
 1. Evals: expected candidate IDs, price extrema, error scenarios and LLM grounding rubric.
