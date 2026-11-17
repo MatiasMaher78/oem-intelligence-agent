@@ -119,23 +119,22 @@ with target.open("x", encoding="utf-8") as stream:
 '@ | python -
 ```
 
-Use that new evidence path in the commands below, or use the already verified
-Delivery 03 artifact as shown.
+The commands below use that newly generated evidence path.
 
 Run from the repository root. Choose fresh output paths; all commands are local
 and use only standard-library Python:
 
 ```powershell
-python -m oem_agent.stage4 create --evidence runs/delivery03-verification/statistics.json --out reviews/delivery04-v1.review.json
+python -m oem_agent.stage4 create --evidence runs/delivery04-input/statistics.json --out reviews/delivery04-v1.review.json
 
-python -m oem_agent.stage4 show --dossier reviews/delivery04-v1.review.json --evidence runs/delivery03-verification/statistics.json
+python -m oem_agent.stage4 show --dossier reviews/delivery04-v1.review.json --evidence runs/delivery04-input/statistics.json
 ```
 
 After an operator actually reviews a case, they supply their own identifier and
 reason. The following is a test-only example, not an instruction to approve:
 
 ```powershell
-python -m oem_agent.stage4 decide --dossier reviews/delivery04-v1.review.json --evidence runs/delivery03-verification/statistics.json --inventory-id 10 --state approved --reviewer TEST-REVIEWER --reason "Test-only explicit decision" --decision-id TEST-D1 --out reviews/delivery04-v2.review.json
+python -m oem_agent.stage4 decide --dossier reviews/delivery04-v1.review.json --evidence runs/delivery04-input/statistics.json --inventory-id 10 --state approved --reviewer TEST-REVIEWER --reason "Test-only explicit decision" --decision-id TEST-D1 --out reviews/delivery04-v2.review.json
 
 # Regenerate Delivery 03 JSON when source evidence changes, then bind a new revision:
 python -m oem_agent.stage4 refresh --dossier reviews/delivery04-v2.review.json --evidence runs/updated-statistics.json --out reviews/delivery04-v3.review.json

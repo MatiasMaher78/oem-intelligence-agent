@@ -1,15 +1,23 @@
 # Stage 5.4: one instruction source and auditable context
 
-Stage 5.3 is accepted in local commit `20fbc6b701bf798f0b7e53470e3289c363eb0778`.
-Its 19 selected source/document/test files exclude credentials, generated data
-and reports. The 268-test baseline passed before committing. Stage 5.4 is separate
-and remains uncommitted pending review. No real provider call is part of 5.4.
+Historical implementation and pre-commit verification record. Stage 5.3 was
+accepted in commit `20fbc6b701bf798f0b7e53470e3289c363eb0778`; its 19 selected
+source/document/test files exclude credentials, generated data and reports, and
+its 268-test baseline passed before committing. Stage 5.4 was subsequently
+accepted and committed as `500f3fdb2a53488a125e7618148b26c86d82f980` after 283
+passing tests. No real provider call was part of 5.4.
+
+This milestone introduced skill 1.0.0. The packaged skill is now **1.0.2** after
+5.5 follow-ups; the historical measurements below are not its current size or
+new evaluation results. See the [current architecture](ARCHITECTURE.md) and
+[evaluation reference](EVALUATION.md) for the implemented system and its limits.
 
 ## Instruction ownership and scope
 
 - AGENTS.md: developer/repository process. Never injected into LLM context.
 - [OEM evidence skill](../oem_agent/skills/oem-evidence-review/SKILL.md): the single
-  current runtime instruction source, name oem-evidence-review, version 1.0.0.
+  runtime instruction source, name oem-evidence-review. This milestone introduced
+  version 1.0.0; the current version is 1.0.2, as recorded in [5.5](STAGE_5_5.md).
 - stage5_contracts/stage5_dispatcher: enforced schemas, permissions and budgets.
   The skill has no ability to add tools, writes, providers or authorization.
 - Delivery/architecture decision/5.3 documents: scoped implementation history,
@@ -32,8 +40,9 @@ resources fail closed. Runtime loading uses standard-library importlib.resources
 no YAML dependency or dynamically included instructions are added. The portable
 skill also passes the available skill-creator validator.
 
-The current prompt body is 778 bytes versus 792 in accepted 5.3. Only that body,
-the question, native schemas and existing compact result projections go to the
+At the 5.4 milestone, the prompt body was 778 UTF-8 bytes versus 792 in accepted
+5.3. These are historical text sizes, not tokens; the current skill is 1.0.2.
+Only the loaded skill body, the question, native schemas and compact projections go to the
 selected model. No AGENTS, historical documents, manifest dumps, source appendices
 or configuration trace is added to the model's conversation. R source labels are
 attached after generation. No history pruning or new summarizer is introduced.
@@ -110,7 +119,8 @@ new ignored directory `runs/stage5-4-consolidation-20261105-38c0fa48/`.
 The original cases, stock selection, SQL, statistics, DEMO costs and human
 expedients are unchanged. Earlier real Groq evidence remains valid for accepted
 5.3; it is not a real evaluation of the changed 5.4 prompt. New real inference
-requires explicit user authorization. No commit/publication of 5.4 is performed.
+requires explicit user authorization. That pre-commit verification performed
+no commit or publication; 5.4 was subsequently committed as noted above.
 
 ## Final offline results (2026-11-05)
 
@@ -132,8 +142,10 @@ requires explicit user authorization. No commit/publication of 5.4 is performed.
   actual .env was never read, printed or hashed. .env/variants remain ignored and
   untracked, .env.example has no key value, generated data/reports remain excluded.
   Pattern scanning cannot prove absence of every arbitrary secret.
-- HEAD remains the selective 5.3 commit, index empty, no remotes or publication.
-  Stage 5.4 has 14 pending paths (including two retired skills); it is uncommitted.
+- At this 2026-11-05 pre-commit verification, HEAD was the selective 5.3 commit,
+  the index was empty and no remotes or publication existed. The 14 then-pending
+  5.4 paths included two retired skills; they were subsequently recorded in the
+  accepted 5.4 commit above. These are historical Git observations.
 
 Review evidence: stage54-tests.txt, stage54-test-summary.json,
 package-resource-check.json, deterministic-regression.json,

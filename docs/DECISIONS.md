@@ -1,4 +1,31 @@
-# Decision history
+# Engineering decisions
+
+This index explains the decisions applied by the current implementation. The
+original ADRs below are preserved without rewriting their recorded scope or
+outcomes. The [architecture](ARCHITECTURE.md) describes the current system;
+[evaluation](EVALUATION.md) separates the closed 5.5 baseline from later local
+regressions and the limited real-model results.
+
+## Current decision index
+
+| Decision applied today | Engineering reason | Existing records |
+| --- | --- | --- |
+| Keep numerical truth in SQL/Python and explanations advisory. | Reproducible selection, matching and prices do not depend on model prose. | [ADR 001](#architecture-decision-record-001), [ADR 004](#architecture-decision-record-004) |
+| Isolate fixtures and separate OEM identity from declared compatibility. | Preserve the original demo and all selected pieces; missing offers or a source failure cannot diagnose catalog errors. | [ADR 002](#architecture-decision-record-002), [ADR 003](#architecture-decision-record-003) |
+| Use invented DEMO costs and evidence-bound local review revisions. | Insufficient evidence blocks estimates; a model cannot approve a case or change inventory. | [ADR 005](#architecture-decision-record-005) |
+| Pin immutable evidence and expose five bounded read contracts. | Prevent source drift and arbitrary SQL/filesystem access; preserve references and absent/zero distinctions. | [ADR 006](#architecture-decision-record-006) |
+| Validate every attempt through a local dispatcher. | Invalid calls consume budget; errors, unfinished pages and exhaustion cannot become complete execution. | [ADR 007](#architecture-decision-record-007) |
+| Let one model select native tools through an explicitly chosen transport. | Preserve local tools and controls without keyword routing or automatic provider/model fallback. Groq is the evaluated hosted path; Ollama remains a retained historical path. | [ADR 008](#architecture-decision-record-008), [ADR 009](#architecture-decision-record-009) |
+| Keep one versioned skill, compact projections and configuration/source fingerprints. | Limit context growth and make consulted evidence observable without secrets or private reasoning. Current skill 1.0.2 follows the original 5.4 consolidation. | [ADR 010](#architecture-decision-record-010), [ADR 011](#architecture-decision-record-011) |
+| Evaluate against authored synthetic ground truth and report offline/real outcomes separately. | Scripted protocol passes do not measure general LLM accuracy; matching aggregates retain the same exactness and evidence requirements. | [ADR 011](#architecture-decision-record-011) |
+
+The original two-tool design, local-model recommendation and increment-specific
+"future work" are historical context, not current defaults or authorization.
+The sole packaged skill supplies runtime instructions; this index and the ADRs
+are not model context. [The history index](history/README.md) links the delivery
+and experiment records without changing their paths.
+
+## Historical ADR records
 
 Each record describes its increment when authored; deferred features in an older
 record are historical. Current Stage 5 runtime instructions have one versioned

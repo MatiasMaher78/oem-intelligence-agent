@@ -74,12 +74,34 @@ def write_outputs(directory: Path, *, records: list[dict], harness: Harness,
     (directory / "report.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
     headings = ["# OEM Intelligence Agent — demo report", "", "Data: entirely synthetic. No live market lookup.",
                 f"Cases: {len(records)} | Aged threshold: {threshold_days} days | Mode: {mode}", ""]
-    for case in records:
+    headings.extend([
+        f"Selection: stock > 0 and (age >= {threshold_days} days or OEM unverified).",
+        "Priority (DEMO; first matching rule wins):",
+        "- HIGH: OEM unverified, or age >= 180 days with sales last 90 days = 0.",
+        "- MEDIUM: only if HIGH does not apply; at least one risk flag, or "
+        f"age >= {threshold_days} days with sales last 90 days = 0.",
+        "- LOW: neither HIGH nor MEDIUM applies. Selected LOW cases still require human review.",
+        "Presentation order: HIGH, MEDIUM, LOW; then age descending and inventory ID ascending.",
+        "",
+    ])
+    priority_order = {"high": 0, "medium": 1, "low": 2}
+    reason_labels = {
+        "aged_inventory": f"Age >= {threshold_days} days",
+        "oem_needs_verification": "OEM requires verification",
+    }
+    # Sort only the Markdown view; preserve source records, JSON and tool traces.
+    for case in sorted(records, key=lambda c: (
+            priority_order[c["priority"]], -c["days_in_stock"], c["inventory_id"])):
         m = case["market"]
+        sales = case.get("sales_90d")
         headings.extend([
             f"## #{case['inventory_id']} · {case['part_name']} — {case['priority'].upper()}",
             f"OEM: `{case['oem']}` | Stock: {case['stock_qty']} | Age: {case['days_in_stock']} days",
-            f"Reasons: {', '.join(case['reasons'])}",
+            f"Sales last 90 days: {sales if sales is not None else 'unknown'}",
+            f"OEM verified: {'yes' if case['oem_verified'] else 'no'} | "
+            f"Inventory unit price: EUR {case['our_price_eur']:.2f}",
+            "Selection reason: " + "; ".join(
+                reason_labels.get(reason, reason) for reason in case["reasons"]),
             f"Market: {m['offers_count']} listings; {m['total_listed_units']} listed units; "
             f"min EUR {m['min_price_eur'] if m['min_price_eur'] is not None else 'sin datos'}; "
             f"max EUR {m['max_price_eur'] if m['max_price_eur'] is not None else 'sin datos'}",
